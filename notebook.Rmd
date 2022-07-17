@@ -1,0 +1,96 @@
+---
+title: "ML Project"
+output: 
+  html_document:
+    number_sections: true
+    css: "settings/style.css"
+---
+<!-- Irei formatar o cabeçalho no final -->
+```{r include=FALSE}
+source('settings/setup.R')
+```
+
+```{r echo=F, message=F,warning=F,results='hide'}
+source('settings/plots_style.R')
+```
+
+$$E(\theta) = \sum_{i=1}^{N} \textbf{w} \cdot x_j$$
+
+```{r echo=FALSE, message=FALSE, results='hide', warning=FALSE}
+# Pacote para usar python no R
+# install.packages("reticulate")
+library(reticulate)
+```
+
+<!-- ======================================================================= -->
+<!-- Exemplificando como funciona a integração Python <-> R -->
+```{r}
+var_do_r <- TRUE
+```
+
+```{python }
+var_do_py = True
+```
+
+```{r}
+py$var_do_py
+```
+
+```{python}
+r.var_do_r
+```
+
+```{r}
+plot(iris$Sepal.Length, pch = 19)
+```
+
+
+```{r fig.height=10}
+par(mfrow=c(2,1))
+plot(cars$dist, pch = 19)
+plot(cars$speed, pch = 19)
+```
+```{r}
+g <- ggplot(cars,aes(dist,speed))+
+  geom_line()
+g
+library(plotly)
+ggplotly(g)
+```
+
+
+<!-- ======================================================================= -->
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+# Apresentação do Problema
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+# Modelo 1
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+# Modelo 2
+
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+# Modelo 3
+
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+# Comparando Modelos
+
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+# Conclusão
+
+
+
+
+<!-- ======================================================================= -->
+<!-- Parte da formatação -->
+<script src="settings/code.js"></script>
