@@ -4,7 +4,10 @@ knitr::opts_chunk$set(
   fig.align = "center",
   fig.ext='svg',
   dev='svg',
-  comment =NA
+  comment =NA,
+  fig.dim=c(8,6),
+  fig.width = 8,
+  fig.height = 6
 )
 
 #===============================================================================

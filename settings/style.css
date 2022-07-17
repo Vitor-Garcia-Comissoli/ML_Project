@@ -32,4 +32,10 @@ pre:not([class]){
     box-shadow: 1px 1px 4px #00000033;
 }
 
+.plotly.html-widget.html-widget-static-bound.js-plotly-plot{
+  width: 100% !important;
+  display:flex!important;
+  justify-content: center!important;
+}
+
 </style>

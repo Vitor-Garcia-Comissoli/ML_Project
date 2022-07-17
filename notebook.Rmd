@@ -10,17 +10,19 @@ output:
 source('settings/setup.R')
 ```
 
-```{r echo=F, message=F,warning=F,results='hide'}
-source('settings/plots_style.R')
-```
-
-$$E(\theta) = \sum_{i=1}^{N} \textbf{w} \cdot x_j$$
-
 ```{r echo=FALSE, message=FALSE, results='hide', warning=FALSE}
 # Pacote para usar python no R
 # install.packages("reticulate")
 library(reticulate)
 ```
+
+```{r echo=F, message=F,warning=F,results='hide'}
+source('settings/plots_style.R')
+source_python('settings/plots_style.py')
+```
+
+$$E(\theta) = \sum_{i=1}^{N} \textbf{w} \cdot x_j$$
+
 
 <!-- ======================================================================= -->
 <!-- Exemplificando como funciona a integração Python <-> R -->
@@ -34,6 +36,7 @@ var_do_py = True
 
 ```{r}
 py$var_do_py
+#Comentario
 ```
 
 ```{python}
@@ -45,8 +48,7 @@ plot(iris$Sepal.Length, pch = 19)
 ```
 
 
-```{r fig.height=10}
-par(mfrow=c(2,1))
+```{r}
 plot(cars$dist, pch = 19)
 plot(cars$speed, pch = 19)
 ```
@@ -56,6 +58,31 @@ g <- ggplot(cars,aes(dist,speed))+
 g
 library(plotly)
 ggplotly(g)
+```
+
+```{python}
+import numpy as np
+def hist_and_lines():
+    np.random.seed(0)
+    fig, ax = plt.subplots(1, 2, figsize=(11, 4))
+    ax[0].hist(np.random.randn(1000))
+    for i in range(3):
+        ax[1].plot(np.random.rand(10))
+    ax[1].legend(['a', 'b', 'c'], loc='lower left')
+    # fig.patch.set_alpha(0.0)
+    # ax[0].patch.set_alpha(0.0)
+    # ax[1].patch.set_alpha(0.0)
+    
+hist_and_lines()
+    
+plt.show()
+```
+
+```{python}
+sns.barplot(x=["A", "B", "C"], y=[1, 3, 2])
+```
+```{r}
+plot(iris$Sepal.Width ~ iris$Species, col = c('red','blue','green'))
 ```
 
 
