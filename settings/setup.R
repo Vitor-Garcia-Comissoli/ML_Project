@@ -7,7 +7,8 @@ knitr::opts_chunk$set(
   comment =NA,
   fig.dim=c(8,6),
   fig.width = 8,
-  fig.height = 6
+  fig.height = 6,
+  warning=F
 )
 
 #===============================================================================
