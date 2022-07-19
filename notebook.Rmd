@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: '<p class="h1" style="font-weight:600">Projeto Final</p>
       <p class="h2">MAC0460 - Introdução ao aprendizado de máquina</p>
@@ -90,3 +91,96 @@ DT::datatable(py$df, rownames = F)
 <!-- ======================================================================= -->
 <!-- Parte da formatação -->
 <script src="settings/code.js"></script>
+=======
+---
+title: ""
+output: 
+  html_document:
+    number_sections: true
+    css: "settings/style.css"
+---
+<!--------------------------------- Cabeçalho --------------------------------->
+<h1 style="font-weight:600">Projeto Final</h1>
+<h2>MAC0460 - Machine Learning - Introdução ao aprendizado de máquina</h2>
+<h4>Profª Nina Hirata</h4>
+<br>
+<div style="font-size:revert; font-weight: 200;text-align:right">
+André Kenji Florentino Yamamoto - 11809621 <br>
+Bruno Groper Morbin - 11809875 <br>
+Luigi Pavarini de Lima - 11844642 <br>
+Vitor Garcia Comissoli - 11810411 <br>
+</div>
+<!----------------------------------------------------------------------------->
+
+```{r include=FALSE}
+source('settings/setup.R')
+```
+
+```{r echo=FALSE, message=FALSE, results='hide', warning=FALSE}
+# Pacote para usar python no R
+# install.packages("reticulate")
+library(reticulate)
+```
+
+```{r echo=F, message=F,warning=F,results='hide'}
+source('settings/plots_style.R')
+source_python('settings/plots_style.py')
+```
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+# Problema
+
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+# Dados
+
+## Tratamento dos dados
+
+```{python code=readLines("scripts/script_elt.py"), include=T}
+#Entire Code of ETL data
+```
+
+## Dataframe usado
+
+```{r}
+DT::datatable(py$df, rownames = F)
+```
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+# Modelos
+
+## Regressão Logística 
+<!-- Regressão Logística -->
+
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+## Árvore de Decisão
+<!-- Árvore de Decisão -->
+
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+## KNN ( _K-Nearest Neighbors_ )
+<!-- kNN -->
+
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+# Comparando modelos
+
+
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+# Conclusão
+
+
+
+
+<!-- ======================================================================= -->
+<!-- Parte da formatação -->
+<script src="settings/code.js"></script>
+>>>>>>> 3ccef94d7154cd69cd0fd4fc6048801a19467be8
