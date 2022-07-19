@@ -56,8 +56,15 @@ document.addEventListener('DOMContentLoaded', () => {
   
 });
 
+var width = document.getElementsByClassName('col-xs-12 col-sm-4 col-md-3')[0].clientWidth;
+var toc = document.getElementById("TOC");
+toc.style.maxWidth = width + "px";
 
-
+$(window).resize(() =>{
+    var width = document.getElementsByClassName('col-xs-12 col-sm-4 col-md-3')[0].clientWidth;
+    var toc = document.getElementById("TOC");
+    toc.style.maxWidth = width + "px";
+});
 
 
 

@@ -63,10 +63,10 @@ select {
   color:#cccccc!important;
 }
 
-.datatables.html-widget.html-widget-static-bound {
-  border-radius: 10px;
-  filter: drop-shadow(1px 1px 4px #00000080);
-  border: 1px solid black;
+.datatables.html-widget.html-widget-static-bound, .pagedtable-wrapper {
+  border-radius: 10px!important;
+  filter: drop-shadow(1px 1px 4px #00000080)!important;
+  border: 2px solid black!important;
   background-color: #141414 !important;
 }
 
@@ -85,8 +85,40 @@ select {
   border-top: none!important;
 }
 #tabelas_customizadas thead{
-  background-color: #000c0c;
+  background-color: black;
   border-bottom: 2px solid black !important;
+}
+
+.table>tbody>tr>td {
+  border-top: none!important;
+}
+
+#TOC {
+    border-radius: 0!important;
+    margin: unset!important;
+    padding: 10px!important;
+    height: 100%!important;
+    max-height: none!important;
+    width: -webkit-fill-available!important;
+    background-color: #2e2e2e!important;
+    border: none!important;
+}
+
+.list-group-item{
+  background-color: inherit;
+}
+
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+  background-color: slategrey;
+  border-color: slategrey;
+}
+
+.col-xs-12.col-sm-4.col-md-3{
+  padding:0!important;
+}
+
+.toc-content.col-xs-12.col-sm-8.col-md-9{
+  box-shadow: 5px 0 10px -2px #00000033!important;
 }
 
 </style>

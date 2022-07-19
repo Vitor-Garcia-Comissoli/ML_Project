@@ -1,22 +1,25 @@
 ---
-title: ""
+title: '<p class="h1" style="font-weight:600">Projeto Final</p>
+      <p class="h2">MAC0460 - Introdução ao aprendizado de máquina</p>
+      <p class="h4">Profª Nina Hirata</p>
+      <br>
+      <div style="font-size:small; font-weight: 200;text-align:right">
+      André Kenji Florentino Yamamoto - 11809621 <br>
+      Bruno Groper Morbin - 11809875 <br>
+      Luigi Pavarini de Lima - 11844642 <br>
+      Vitor Garcia Comissoli - 11810411 <br>
+      </div>'
 output: 
   html_document:
     number_sections: true
     css: "settings/style.css"
+    toc: true
+    toc_depth: 3
+    toc_float: 
+      collapsed: false
+      smooth_scroll: false
+    df_print: paged
 ---
-<!--------------------------------- Cabeçalho --------------------------------->
-<h1 style="font-weight:600">Projeto Final</h1>
-<h2>MAC0460 - Machine Learning - Introdução ao aprendizado de máquina</h2>
-<h4>Profª Nina Hirata</h4>
-<br>
-<div style="font-size:revert; font-weight: 200;text-align:right">
-André Kenji Florentino Yamamoto - 11809621 <br>
-Bruno Groper Morbin - 11809875 <br>
-Luigi Pavarini de Lima - 11844642 <br>
-Vitor Garcia Comissoli - 11810411 <br>
-</div>
-<!----------------------------------------------------------------------------->
 
 ```{r include=FALSE}
 source('settings/setup.R')
@@ -32,7 +35,6 @@ library(reticulate)
 source('settings/plots_style.R')
 source_python('settings/plots_style.py')
 ```
-
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 # Problema
@@ -53,7 +55,6 @@ source_python('settings/plots_style.py')
 ```{r}
 DT::datatable(py$df, rownames = F)
 ```
-
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 # Modelos
