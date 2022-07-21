@@ -121,4 +121,19 @@ select {
   box-shadow: 5px 0 10px -2px #00000033!important;
 }
 
+a, a:hover{
+  color: #eb549a;
+}
+
+#repo_icon:hover{
+  opacity:0.5;
+}
+
+li.tocify-item.list-group-item:hover{
+  background-color: dimgrey!important;
+}
+
+code {
+  background-color: #2e2e2e;
+}
 </style>

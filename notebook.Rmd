@@ -39,10 +39,37 @@ source_python('settings/plots_style.py')
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 # Problema
 
+A motivação original de nosso projeto é o entendimento dos padrões climáticos e suas alterações no clima de uma das cidades mais relevantes num cenário global: Londres. Para isso decidimos fazer um projeto do 1º formato (utilizando um dataset público), onde a base escolhida (`london_weather.csv`, obtida no website _Kaggle_ através [desse link](https://www.kaggle.com/datasets/emmanuelfwerr/london-weather-data)) pode ser interpretada como uma série temporal, a medida que mede as variações do tempo (entre 1979 e 2021) de variáveis fixadas em um único local.
 
+O objetivo do projeto é o uso de um algoritmo de machine learning para que o mesmo consiga prever a categoria de duas das variáveis da database (precipitação e neve) para uma nova informação adicionada ao modelo. As categorias seriam então “chove” ou “não chove” e “neva” ou “não neva”.
+A ideia será fazer 3 métodos distintos (Regressão Logística, KNN e Árvore de Decisão), compará-los através de suas métricas relacionadas à acurácia e ver qual tem a melhor performance/predição.
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 # Dados
+
+A base de dados escolhida foi criada a partir da união de medições oriundas de pedidos de atributos individuais do clima providos pela _European Climate Assessment_ (ECA). As medidas desta base de dados em particular foram gravadas pela estação climática nas redondezas do Aeroporto Heathrow em Londres, Reino Unido. O tamanho **original** da base de dados escolhida, assim como uma lista dos atributos e suas descrições, está descrito abaixo:
+
+`london_weather.csv` - 15341 observações x 10 atributos:
+
+- `date` - data em que ocorreu a medição - (**int**)
+
+- `cloud_cover` - medição da nebulosidade em oktas - (**float**)
+
+- `sunshine` - medição da luz solar em horas (hrs) - (**float**)
+
+- `global_radiation` - irradiação medida Watt por metro quadrado (W/m2) - (**float**)
+
+- `max_temp` - temperatura máxima registrada em graus Celsius (°C) - (**float**)
+
+- `mean_temp` - temperatura média registrada em graus Celsius (°C) - (**float**)
+
+- `min_temp` - temperatura mínima registrada em graus Celsius (°C) - (**float**)
+
+- `precipitation` - precipitação medida em milímetros (mm) - (**float**)
+
+- `pressure` - pressão medida em Pascals (Pa) - (**float**)
+
+- `snow_depth` - profundidade da neve medida em centímetros (cm) - (**float**)
 
 ## Tratamento dos dados
 
@@ -53,11 +80,13 @@ source_python('settings/plots_style.py')
 ## Dataframe usado
 
 ```{r}
-DT::datatable(py$df, rownames = F)
+DT::datatable(py$data)
 ```
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 # Modelos
+
+Primeiramente devemos encontrar uma solução baseline para o problema proposto. Usando a intuição e o senso comum imagina-se que, em dias muito frios, haverá uma maior probabilidade de nevar, enquanto que dias mais quentes terão maior incidência de chuva e sem neve. Tomemos então isso como nossa solução baseline que será comparada aos modelos categorizados citados acima (Regressão Logística, Árvore de Decisão e KNN).
 
 ## Regressão Logística 
 <!-- Regressão Logística -->
@@ -87,6 +116,15 @@ DT::datatable(py$df, rownames = F)
 
 
 
+Todos códigos referentes ao projeto podem ser encontrados [nesse repositório](https://github.com/bmorbin/ML_Project).
+
+<div style="display: flex;justify-content: flex-end;margin-top:10px">
+<a id="repo_icon" href ="https://github.com/bmorbin/ML_Project" target="_blank">
+  <svg height="32" aria-hidden="true" viewBox="0 0 16 16" width="32" fill="#d6d6d6">
+    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+</svg>
+</a>
+</div>
 <!-- ======================================================================= -->
 <!-- Parte da formatação -->
 <script src="settings/code.js"></script>
