@@ -20,14 +20,12 @@ output:
       smooth_scroll: false
     df_print: paged
 ---
-
+<hr>
 ```{r include=FALSE}
 source('settings/setup.R')
 ```
 
 ```{r echo=FALSE, message=FALSE, results='hide', warning=FALSE}
-# Pacote para usar python no R
-# install.packages("reticulate")
 library(reticulate)
 ```
 
@@ -79,10 +77,11 @@ A base de dados escolhida foi criada a partir da união de medições oriundas d
 
 ## Dataframe usado
 
-```{r}
-DT::datatable(py$data)
+Mostrando as 10000 primeiras linhas do dataframe já tratado.
+```{r echo=F}
+# DT::datatable(py$data)
+py$data
 ```
-
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 # Modelos
 
@@ -118,6 +117,8 @@ Primeiramente devemos encontrar uma solução baseline para o problema proposto.
 
 Todos códigos referentes ao projeto podem ser encontrados [nesse repositório](https://github.com/bmorbin/ML_Project).
 
+<hr>
+
 <div style="display: flex;justify-content: flex-end;margin-top:10px">
 <a id="repo_icon" href ="https://github.com/bmorbin/ML_Project" target="_blank">
   <svg height="32" aria-hidden="true" viewBox="0 0 16 16" width="32" fill="#d6d6d6">
@@ -125,6 +126,7 @@ Todos códigos referentes ao projeto podem ser encontrados [nesse repositório](
 </svg>
 </a>
 </div>
+
 <!-- ======================================================================= -->
 <!-- Parte da formatação -->
 <script src="settings/code.js"></script>
