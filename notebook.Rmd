@@ -19,6 +19,7 @@ output:
       collapsed: false
       smooth_scroll: false
     df_print: paged
+    
 ---
 <hr>
 ```{r include=FALSE}

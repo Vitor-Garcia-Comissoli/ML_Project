@@ -44,12 +44,17 @@ data['rain'] = ["1" if p > 0 else "0" for p in data['precipitation']] # Creating
 
 data['snow'] = ["1" if p > 0 else "0" for p in data['snow_depth']] # Creating column snow indicator
 
+data['rain_snow'] = data['rain']+data['snow'] # Setting the target classifier
+
 data = data.set_index('date') # Set column date to index
 
 
 print(round(data[['snow','rain']].value_counts(normalize=True),3)) # Print proportion of time wich rains and snows
+print(round(data.rain_snow.value_counts(normalize=True),3))
 
 print(data.describe()) # Describe dataframe
+
+
 
 
 
