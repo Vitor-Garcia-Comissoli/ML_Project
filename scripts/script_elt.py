@@ -54,7 +54,13 @@ print(round(data.rain_snow.value_counts(normalize=True),3))
 
 print(data.describe()) # Describe dataframe
 
+n_test = int(len(data)*0.2)
+# 20% for test data
+test_data = data[-n_test:]
 
+n_train_val = len(data) - int(len(data)*0.2)
+# 80% for train and validation
+df = data[:n_train_val]
 
 
 

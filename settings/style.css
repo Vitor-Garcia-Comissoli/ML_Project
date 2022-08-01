@@ -136,4 +136,21 @@ li.tocify-item.list-group-item:hover{
 code {
   background-color: #2e2e2e;
 }
+
+.hljs-keyword{
+  color: #900;
+}
+
+.hljs-comment{
+  color: #998;
+}
+
+.hljs-number {
+    color: #099;
+}
+
+.hljs-string {
+    color: #d14;
+}
+
 </style>

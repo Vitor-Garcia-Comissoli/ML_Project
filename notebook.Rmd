@@ -71,10 +71,85 @@ A base de dados escolhida foi criada a partir da união de medições oriundas d
 - `snow_depth` - profundidade da neve medida em centímetros (cm) - (**float**)
 
 ## Tratamento dos dados
-
+<!-- 
+Funciona usar assim apenas para notebook_document, porém fica com porblema de comentario aparecendo antes de output
 ```{python code=readLines("scripts/script_elt.py"), include=T}
 #Entire Code of ETL data
 ```
+-->
+
+```{python}
+import pandas as pd
+import numpy as np
+
+url = 'https://raw.githubusercontent.com/bmorbin/ML_Project/main/data_raw.csv'
+data = pd.read_csv(url)
+
+# Print raw data
+print(data.head(5)) 
+
+# Print count of NA for each column
+print(data.isna().sum()) 
+
+# Removing rows with NA, except the column snow_depth
+data = data.dropna(subset=[col for col in data.columns if col!='snow_depth']) 
+
+# Print count of NA again after delete some NA
+print(data.isna().sum()) 
+
+# Applying simple regression model to predict missing values from snow_depth
+from sklearn.linear_model import LinearRegression 
+
+def reg_simple(data):
+	'''
+	A function to predict snow depth by mean temperature of the day
+	Returns the maximum snow depth value predict
+	'''    
+	data_reg_train = data.dropna()
+    
+	X_reg_train = np.array(data_reg_train.mean_temp).reshape(-1,1)
+	y_reg_train = np.array(data_reg_train.snow_depth).reshape(-1,1)
+
+	reg = LinearRegression()
+	reg.fit(X_reg_train, y_reg_train)
+    
+	data_NA = data[data['snow_depth'].isna()]
+	y_pred = reg.predict(np.array(data_NA.mean_temp).reshape(-1,1))
+	return(round(max(y_pred)[0],1))
+    
+print(f'Minimum snow depth predicted is {reg_simple(data)}')
+# So the conclusion is to input 0s in missing values from column snow_depth
+data.snow_depth[data['snow_depth'].isna()] = 0 
+
+# Print count of NA again after input NA values from snow_depth
+print(data.isna().sum()) 
+
+# Convert column date to pandas date type
+data['date'] = pd.to_datetime(data['date'].astype(str), format = "%Y%m%d") 
+
+# Creating column month
+data['month'] = data['date'].dt.month.astype(str) 
+
+# Creating column rain indicator
+data['rain'] = ["1" if p > 0 else "0" for p in data['precipitation']] 
+
+# Creating column snow indicator
+data['snow'] = ["1" if p > 0 else "0" for p in data['snow_depth']] 
+
+# Setting the target classifier
+data['rain_snow'] = data['rain']+data['snow'] 
+
+# Set column date to index
+data = data.set_index('date') 
+
+# Print proportion of time wich rains and snows
+print(round(data[['snow','rain']].value_counts(normalize=True),3)) 
+print(round(data.rain_snow.value_counts(normalize=True),3))
+
+# Describe dataframe
+print(data.describe()) 
+```
+
 
 ## Dataframe usado
 
@@ -88,37 +163,288 @@ py$data
 
 Primeiramente devemos encontrar uma solução baseline para o problema proposto. Usando a intuição e o senso comum imagina-se que, em dias muito frios, haverá uma maior probabilidade de nevar, enquanto que dias mais quentes terão maior incidência de chuva e sem neve. Tomemos então isso como nossa solução baseline que será comparada aos modelos categorizados citados acima (Regressão Logística, Árvore de Decisão e KNN).
 
+```{python}
+# 20% for test data
+n_test = int(len(data)*0.2)
+test_data = data[-n_test:]
+
+# 80% for train and validation
+n_train_val = len(data) - int(len(data)*0.2)
+df = data[:n_train_val]
+
+target = 'rain_snow'
+input_columns = ['cloud_cover','sunshine','global_radiation','max_temp','mean_temp','min_temp','pressure','month']
+
+X, y = df[input_columns], df[target] 
+
+# checking if all classes are present in the training set
+print(y.value_counts())
+```
+Nos algoritmos a seguir, serão utilizados 30% do conjunto `df` (conjunto sem a parte de teste) para validação e 70% para treino.      
+
 ## Regressão Logística 
 <!-- Regressão Logística -->
+Para o algoritmo de classificação por Regressão Logística, serão comparados as diferentes combinações de variáveis.
+
+[Reference](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression)
+
+```{python}
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+import time
+from sklearn.linear_model import LogisticRegression
+import itertools
+
+start = time.time()
+
+# creating all combinations of the inputs variables
+comb = []
+for L in range(1, len(input_columns)+1):
+    for subset in itertools.combinations(input_columns, L):
+        comb.append(list(subset))
+print("Number of combinations: ",len(comb))
+```
+
+
+```{python results='hide'}
+l_total_train = []
+l_total_val = []
+
+b=5 #iterations for bootstrap
+for c in comb:
+    l_a_train = []
+    l_a_val = []
+    for i in range(1,b):
+        X_train, X_val, y_train, y_val = train_test_split(X,y,test_size=0.3, random_state=i)
+        X_train_comb, X_val_comb = X_train[c], X_val[c]
+                
+        clf = LogisticRegression(multi_class='ovr',solver='lbfgs')
+        clf = clf.fit(X_train_comb, y_train)
+        
+        l_a_train += [sum(clf.predict(X_train_comb) == y_train)]
+        l_a_val += [sum(clf.predict(X_val_comb) == y_val)]
+    
+    l_total_train += [np.array(l_a_train)]
+    l_total_val += [np.array(l_a_val)]
+
+mean_train = np.transpose(1-np.array(l_total_train)/len(y_train)).mean(0)
+sd_train = np.transpose(1-np.array(l_total_train)/len(y_train)).std(0)
+
+mean_val = np.transpose(1-np.array(l_total_val)/len(y_val)).mean(0)
+sd_val = np.transpose(1-np.array(l_total_val)/len(y_val)).std(0)
+
+axis_x = list(range(len(comb)))
+
+# reorder the values by the minimum mean error of train to maximum mean error of train
+sort_index = [tup[0] for tup in sorted(list(zip(axis_x,mean_train)),key=lambda tup: tup[1], reverse=True)]
+mean_train = mean_train[sort_index]
+sd_train = sd_train[sort_index]
+mean_val = mean_val[sort_index]
+sd_val = sd_val[sort_index]
+
+# index of best combination
+best_comb_ID = list(mean_val).index(min(mean_val))
+
+# Plotting the combinations with errors
+plt.title('Regressão Logística\nErro x Combinação')
+plt.xlabel('ID Combinação')
+plt.ylabel('Erro') 
+plt.plot(axis_x, mean_train, label="Treino")
+plt.plot(axis_x, mean_val, label="Validação")
+plt.xticks(axis_x, rotation = 90)
+```
+
+
+```{python}
+plt.fill_between(axis_x, mean_train+sd_train, mean_train-sd_train, alpha=0.5)
+plt.fill_between(axis_x, mean_val+sd_val, mean_val-sd_val, alpha=0.5)
+plt.axvline(x=best_comb_ID,color='silver', linestyle='dashed')
+plt.legend(loc="lower left")
+plt.tick_params(axis='x', which='major', labelsize=1)
+plt.show()
+
+end = time.time()
+
+print("Spending time to Logistic Regression analysis of combinations:",(end-start)/60, "minutes")
+```
 
 
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 ## Árvore de Decisão
 <!-- Árvore de Decisão -->
+Para o algoritmo de classificação por Árvore de Decisão, comparou-se os valores de profundidade máxima da árvore que apresentaram menor erro de validação.
 
+[Reference](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier)
+<!--
+```{python,code=readLines("scripts/script_tree.py", encoding="UTF-8"), include=T,out.width="85%"}
+#Entire Code of Decision Tree
+```
+-->
+
+```{python results='hide'}
+from sklearn import tree
+
+l_total_train = []
+l_total_val = []
+
+start = time.time()
+
+b=20 # iterator bootstrap (resampling the set)
+c=20 # number of complexity based on max_width
+for j in range(0,b):
+    X_train, X_val, y_train, y_val = train_test_split(X,y,test_size=0.3, random_state = j)
+    
+    l_a_train = []
+    l_a_val = []
+    
+    for i in range(1,c):
+        clf = tree.DecisionTreeClassifier(max_depth = i, criterion = "gini")
+        clf = clf.fit(X_train, y_train)
+        l_a_train += [sum(clf.predict(X_train) == y_train)]
+        l_a_val += [sum(clf.predict(X_val) == y_val)]
+    
+    l_total_train += [np.array(l_a_train)]
+    l_total_val += [np.array(l_a_val)]
+
+mean_train = np.transpose(1-np.array(l_total_train)/len(y_train)).mean(1)
+sd_train = np.transpose(1-np.array(l_total_train)/len(y_train)).std(1)
+
+mean_val = np.transpose(1-np.array(l_total_val)/len(y_val)).mean(1)
+sd_val = np.transpose(1-np.array(l_total_val)/len(y_val)).std(1)
+
+# best max_depth argument to don't overfit
+best_depth = list(mean_val).index(min(mean_val))+1
+
+axis_x = list(range(1,c))
+
+# Plotting 
+plt.title('Árvore de Decisão\nErro x Complexidade')
+plt.xlabel('Complexidade: Profundidade Máxima')
+plt.ylabel('Erro') 
+plt.plot(axis_x, mean_train, label="Treino")
+plt.plot(axis_x, mean_val, label="Validação")
+plt.xticks(axis_x)
+```
+
+
+```{python}
+plt.fill_between(axis_x, mean_train+sd_train, mean_train-sd_train, alpha=0.5)
+plt.fill_between(axis_x, mean_val+sd_val, mean_val-sd_val, alpha=0.5)
+plt.axvline(x=best_depth,color='gray', linestyle='dashed')
+plt.legend(loc="lower left")
+plt.show()
+
+end = time.time()
+# time spending to load all algorithm analysis
+print("Spending time for Decision Tree analysis of complexity:",(end-start)/60, "minutes")
+```
 
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 ## KNN ( _K-Nearest Neighbors_ )
 <!-- kNN -->
+[Notebook Reference](https://github.com/krishnaik06/K-Nearest-Neighour/blob/master/K%20Nearest%20Neighbors%20with%20Python.ipynb)
+
+
+```{python results="hide"}
+from sklearn.neighbors import KNeighborsClassifier
+b=20 # iterator bootstrap (resampling the set)
+c=20 # number of complexity based on number of neighbors
+for j in range(0,b):
+    X_train, X_val, y_train, y_val = train_test_split(X,y,test_size=0.3, random_state = j)
+    
+    l_a_train = []
+    l_a_val = []
+    
+    for i in range(1,c):
+        clf = KNeighborsClassifier(n_neighbors=c)        
+        clf = clf.fit(X_train, y_train)
+        l_a_train += [sum(clf.predict(X_train) == y_train)]
+        l_a_val += [sum(clf.predict(X_val) == y_val)]
+    
+    l_total_train += [np.array(l_a_train)]
+    l_total_val += [np.array(l_a_val)]
+
+mean_train = np.transpose(1-np.array(l_total_train)/len(y_train)).mean(1)
+sd_train = np.transpose(1-np.array(l_total_train)/len(y_train)).std(1)
+
+mean_val = np.transpose(1-np.array(l_total_val)/len(y_val)).mean(1)
+sd_val = np.transpose(1-np.array(l_total_val)/len(y_val)).std(1)
+
+best_nn = list(mean_val).index(min(mean_val))+1
+
+axis_x = list(range(1,c))
+
+# Plotting for view the best number of neighbors
+plt.title('KNN\nErro x Complexidade')
+plt.xlabel('Complexidade: número de vizinhos')
+plt.ylabel('Erro') 
+plt.plot(axis_x, mean_train, label="Treino")
+plt.plot(axis_x, mean_val, label="Validação")
+plt.xticks(axis_x)
+```
+
+
+```{python}
+plt.fill_between(axis_x, mean_train+sd_train, mean_train-sd_train, alpha=0.5)
+plt.fill_between(axis_x, mean_val+sd_val, mean_val-sd_val, alpha=0.5)
+plt.axvline(x=best_nn,color='silver', linestyle='dashed')
+plt.legend(loc="lower left")
+plt.show()
+
+end = time.time()
+
+print("Spending time for KNN algorithm analysis:",(end-start)/60, "minutes")
+```
 
 
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 # Comparando modelos
 
+A partir da seleção de parâmetros de cada algoritmo realizada nas seções anteriores, compara-se então os modelos entre si para analisar qual possui melhor acurácia.
 
+```{python}
+from sklearn.metrics import plot_confusion_matrix
+
+X_train, X_val, y_train, y_val = train_test_split(X,y,test_size=0.3, random_state = 0)
+X_train_comb, X_val_comb = X_train[comb[best_comb_ID]], X_val[comb[best_comb_ID]]
+
+print("Accuracy of Regression Model: ",sum(LogisticRegression(multi_class='ovr',solver='lbfgs').fit(X_train_comb, y_train).predict(X_val_comb) == y_val)/len(y_val))
+plot_confusion_matrix(LogisticRegression(multi_class='ovr',solver='lbfgs').fit(X_train_comb, y_train), X_val_comb, y_val)  
+plt.show()
+
+print("Accuracy of Decision Tree: ",sum(tree.DecisionTreeClassifier(max_depth=best_depth, criterion = "gini").fit(X_train, y_train).predict(X_val) == y_val)/len(y_val))
+plot_confusion_matrix(tree.DecisionTreeClassifier(max_depth=best_depth, criterion = "gini").fit(X_train, y_train), X_val, y_val)  
+plt.show()
+
+print("Accuracy of KNN: ",sum(KNeighborsClassifier(n_neighbors=best_nn).fit(X_train, y_train).predict(X_val) == y_val)/len(y_val))
+plot_confusion_matrix(KNeighborsClassifier(n_neighbors=best_nn).fit(X_train, y_train), X_val, y_val)  
+plt.show()
+```
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 # Conclusão
 
+Conclui-se então que o algoritmo árvore de decisão apresenta maior acurácia, além de ser o algoritmo mais rápido para análise. Portanto, roda-se a seguir o modelo com o conjunto de dados de teste:
 
+```{python}
+# Fit the model selected
+model = tree.DecisionTreeClassifier(max_depth=best_depth, criterion = "gini").fit(X_train, y_train)
 
+X_test = test_data[input_columns]
+y_test = test_data[target]
 
-Todos códigos referentes ao projeto podem ser encontrados [nesse repositório](https://github.com/bmorbin/ML_Project).
+print("Accuracy of Decision Tree to test data: ",sum(model.predict(X_test) == y_test)/len(y_test))
+plot_confusion_matrix(model, X_test, y_test)  
+plt.show()
+```
+
 
 <hr>
+Todos códigos referentes ao projeto podem ser encontrados [nesse repositório](https://github.com/bmorbin/ML_Project).
+
 
 <div style="display: flex;justify-content: flex-end;margin-top:10px">
 <a id="repo_icon" href ="https://github.com/bmorbin/ML_Project" target="_blank">
